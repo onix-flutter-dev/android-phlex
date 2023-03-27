@@ -20,8 +20,8 @@ assembleDebug:
   stage: build
   only:
     - dev
-  dependencies:
-    - changelog
+#  dependencies:
+#    - changelog
   script:
     - apt-get --quiet update --yes
     - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
