@@ -16,7 +16,6 @@ stages:
   # - deploy
   # - notify
 
-
 sync-with-github:
   stage: syncGithub
   only:
