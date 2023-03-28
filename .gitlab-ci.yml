@@ -32,6 +32,9 @@ deploy:
     - git clone $REMOTE_GITHUB_REPOSITORY_URL github_repo
     - cd github_repo
     - git checkout -b $CI_COMMIT_BRANCH
+
+    - git pull https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git --rebase
+
     - git pull https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git $CI_MERGE_REQUEST_BRANCH_NAME --allow-unrelated-histories 
     - git push origin $CI_COMMIT_BRANCH
 
