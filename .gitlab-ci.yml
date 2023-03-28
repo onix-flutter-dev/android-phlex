@@ -1,0 +1,169 @@
+image: openjdk:11-jdk
+
+variables:
+  ANDROID_COMPILE_SDK: "33"
+  ANDROID_BUILD_TOOLS: "30.0.3"
+  ANDROID_SDK_TOOLS: "7583922"
+  CI_GITLAB_API_TOKEN: $CI_GITLAB_API_TOKEN
+
+stages:
+#  - SonarqubeMRDecoration
+#  - sonar
+#  - syncGithub
+ - deploy
+ - changelog
+  # - build
+
+#  - deploy
+  # - notify
+
+deploy:
+  interruptible: true
+  stage: deploy
+  before_script:
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+    # - git config pull.ff only
+    - git config pull.rebase true
+  script:
+    - echo https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
+    - echo $REMOTE_GITHUB_REPOSITORY_URL
+    - echo $CI_COMMIT_BRANCH
+
+    - git clone $REMOTE_GITHUB_REPOSITORY_URL github_repo
+    - cd github_repo
+    - git checkout -b $CI_COMMIT_BRANCH
+
+    # - git pull https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git --rebase
+
+    - git pull https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git $CI_MERGE_REQUEST_BRANCH_NAME --allow-unrelated-histories 
+    - git push origin $CI_COMMIT_BRANCH
+
+# sync-with-github:
+#   stage: syncGithub
+#   only:
+#    - dev 
+#   before_script:
+#     - git config --global user.name "${GITLAB_USER_NAME}"
+#     - git config --global user.email "${GITLAB_USER_EMAIL}"
+#   script:
+#     - git remote add github $REMOTE_REPOSITORY_URL
+#     - git checkout master
+#     - git pull origin master
+#     - git pull github master
+#     - git status
+#     - git push https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:master
+
+
+# assembleDebug:
+#   interruptible: true
+#   stage: build
+#   only:
+#     - dev
+# #  dependencies:
+# #    - changelog
+#   script:
+#     - apt-get --quiet update --yes
+#     - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+
+#     - export ANDROID_SDK_ROOT="${PWD}/android-home"
+#     - install -d $ANDROID_SDK_ROOT
+#     - wget --output-document=$ANDROID_SDK_ROOT/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+#     - pushd $ANDROID_SDK_ROOT
+#     - unzip -d cmdline-tools cmdline-tools.zip
+#     - pushd cmdline-tools
+#     - mv cmdline-tools tools || true
+#     - popd
+#     - popd
+#     - export PATH=$PATH:${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin/
+
+#     - sdkmanager --version
+
+#     - yes | sdkmanager --licenses || true
+#     - sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}"
+#     - sdkmanager "platform-tools"
+#     - sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
+#     - chmod +x ./gradlew
+#     - ./gradlew assembleDebug
+
+
+    # FIREBASE
+#    - wget https://firebase.tools/bin/linux/latest -O firebase_tools
+#    - chmod +x ./firebase_tools
+#    - ./firebase_tools appdistribution:distribute app/build/outputs/apk/exposure/debug/app-exposure-debug.apk --app $FIREBASE_APP_DEV_ID --groups "test" --token "$FIREBASE_TOKEN" --release-notes-file CHANGELOG.txt
+#  artifacts:
+#    expire_in: 1 week
+#    name: "stage$(date +\"%Y-%m-%d_%H-%M\")"
+#    paths:
+#      - app/build/outputs/apk/exposure/debug/
+
+# SONAR DECORATOR
+#sonarqube_mr_decoration:
+#  stage: SonarqubeMRDecoration
+#  script:
+#    - echo $CI_MERGE_REQUEST_IID
+#    - echo $CI_MERGE_REQUEST_BRANCH_NAME
+#    - echo $CI_PROJECT_ID
+#    - echo sonar.pullrequest.key=$CI_MERGE_REQUEST_IID >> sonar-project.properties
+#    - echo sonar.pullrequest.branch=$CI_MERGE_REQUEST_BRANCH_NAME >> sonar-project.properties
+#  only:
+#    - dev
+#  tags:
+#    - kuber
+
+# SONAR
+#sonarqube-check:
+#  stage: sonar
+#  tags:
+#    - kuber
+#  image:
+#    name: sonarsource/sonar-scanner-cli:latest
+#    entrypoint: [ "" ]
+#  variables:
+#    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+#    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+#  cache:
+#    key: "${CI_JOB_NAME}"
+#    paths:
+#      - .sonar/cache
+#  script:
+#    - sonar-scanner
+#  allow_failure: true
+#  only:
+#    - dev
+
+# SLACK MESSAGE
+# release-notify:
+#   stage: notify
+#   only:
+#     - dev
+#   dependencies:
+#     - changelog
+#   image:
+#     name: curlimages/curl
+#   script:
+#     - CI_COMMIT_RELEASE_NOTES=`cat CHANGELOG.txt`
+#     - echo "$CI_COMMIT_RELEASE_NOTES"
+#     - SLACK_MESSAGE="📦 Release Android => ${CI_COMMIT_BRANCH}"
+#     - echo "$SLACK_MESSAGE"
+#     - curl -v -X POST --data "{'title':'${SLACK_MESSAGE}', 'text':'${CI_COMMIT_RELEASE_NOTES}'}" https://hooks.slack.com/services/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
+
+# INFO
+changelog:
+ stage: changelog
+ only:
+   - dev 
+ image:
+   name: orhunp/git-cliff:latest
+   entrypoint: [ "" ]
+ variables:
+   GIT_STRATEGY: clone
+   GIT_DEPTH: 0
+ script:
+   - git-cliff --latest -r . > cliff.txt
+   - cat cliff.txt | head -n -2 > cutlog.txt
+   - awk '!x[$0]++' cutlog.txt > CHANGELOG.txt
+   - cat CHANGELOG.txt
+ artifacts:
+   paths:
+     - CHANGELOG.txt
