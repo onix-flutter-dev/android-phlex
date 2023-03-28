@@ -20,7 +20,8 @@ stages:
 deploy:
   stage: deploy
   before_script:
-    - git config --global
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
   script:
     - echo https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
     - echo $REMOTE_GITHUB_REPOSITORY_URL
