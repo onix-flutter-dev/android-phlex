@@ -29,7 +29,7 @@ deploy:
     - git clone $REMOTE_GITHUB_REPOSITORY_URL github_repo
     - cd github_repo
     - git checkout -b dev
-    - git pull https://root:NFcy2ChrytjK3hnsBgUs@$CI_SERVER_HOST/$CI_PROJECT_PATH.git dev --allow-unrelated-histories
+    - git pull https://root:NFcy2ChrytjK3hnsBgUs@$CI_SERVER_HOST/$CI_PROJECT_PATH.git dev --ff-only
     - git push origin dev 
 
 # sync-with-github:
