@@ -112,7 +112,7 @@ stages:
 changelog:
  stage: changelog
  only:
-   - dev
+   - dev 
  image:
    name: orhunp/git-cliff:latest
    entrypoint: [ "" ]
