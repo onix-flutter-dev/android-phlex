@@ -18,6 +18,7 @@ stages:
   # - notify
 
 deploy:
+  interruptible: true
   stage: deploy
   before_script:
     - git config --global user.name "${GITLAB_USER_NAME}"
