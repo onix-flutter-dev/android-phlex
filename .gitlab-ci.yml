@@ -9,42 +9,42 @@ variables:
 stages:
 #  - SonarqubeMRDecoration
 #  - sonar
-#  - changelog
-  - build
+ - changelog
+  # - build
 
   # - deploy
   # - notify
 
-assembleDebug:
-  interruptible: true
-  stage: build
-  only:
-    - dev
-#  dependencies:
-#    - changelog
-  script:
-    - apt-get --quiet update --yes
-    - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+# assembleDebug:
+#   interruptible: true
+#   stage: build
+#   only:
+#     - dev
+# #  dependencies:
+# #    - changelog
+#   script:
+#     - apt-get --quiet update --yes
+#     - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
 
-    - export ANDROID_SDK_ROOT="${PWD}/android-home"
-    - install -d $ANDROID_SDK_ROOT
-    - wget --output-document=$ANDROID_SDK_ROOT/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
-    - pushd $ANDROID_SDK_ROOT
-    - unzip -d cmdline-tools cmdline-tools.zip
-    - pushd cmdline-tools
-    - mv cmdline-tools tools || true
-    - popd
-    - popd
-    - export PATH=$PATH:${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin/
+#     - export ANDROID_SDK_ROOT="${PWD}/android-home"
+#     - install -d $ANDROID_SDK_ROOT
+#     - wget --output-document=$ANDROID_SDK_ROOT/cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+#     - pushd $ANDROID_SDK_ROOT
+#     - unzip -d cmdline-tools cmdline-tools.zip
+#     - pushd cmdline-tools
+#     - mv cmdline-tools tools || true
+#     - popd
+#     - popd
+#     - export PATH=$PATH:${ANDROID_SDK_ROOT}/cmdline-tools/tools/bin/
 
-    - sdkmanager --version
+#     - sdkmanager --version
 
-    - yes | sdkmanager --licenses || true
-    - sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}"
-    - sdkmanager "platform-tools"
-    - sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
-    - chmod +x ./gradlew
-    - ./gradlew assembleDebug
+#     - yes | sdkmanager --licenses || true
+#     - sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}"
+#     - sdkmanager "platform-tools"
+#     - sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}"
+#     - chmod +x ./gradlew
+#     - ./gradlew assembleDebug
 
 
     # FIREBASE
@@ -109,21 +109,21 @@ assembleDebug:
 #     - curl -v -X POST --data "{'title':'${SLACK_MESSAGE}', 'text':'${CI_COMMIT_RELEASE_NOTES}'}" https://hooks.slack.com/services/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
 
 # INFO
-#changelog:
-#  stage: changelog
-#  only:
-#    - dev
-#  image:
-#    name: orhunp/git-cliff:latest
-#    entrypoint: [ "" ]
-#  variables:
-#    GIT_STRATEGY: clone
-#    GIT_DEPTH: 0
-#  script:
-#    - git-cliff --latest -r . > cliff.txt
-#    - cat cliff.txt | head -n -2 > cutlog.txt
-#    - awk '!x[$0]++' cutlog.txt > CHANGELOG.txt
-#    - cat CHANGELOG.txt
-#  artifacts:
-#    paths:
-#      - CHANGELOG.txt
+changelog:
+ stage: changelog
+ only:
+   - dev
+ image:
+   name: orhunp/git-cliff:latest
+   entrypoint: [ "" ]
+ variables:
+   GIT_STRATEGY: clone
+   GIT_DEPTH: 0
+ script:
+   - git-cliff --latest -r . > cliff.txt
+   - cat cliff.txt | head -n -2 > cutlog.txt
+   - awk '!x[$0]++' cutlog.txt > CHANGELOG.txt
+   - cat CHANGELOG.txt
+ artifacts:
+   paths:
+     - CHANGELOG.txt
