@@ -17,7 +17,6 @@ stages:
 #  - deploy
   # - notify
 
-
 deploy:
   stage: deploy
   script:
