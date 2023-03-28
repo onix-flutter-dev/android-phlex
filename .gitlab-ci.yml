@@ -24,7 +24,7 @@ deploy:
     - git clone $REMOTE_REPOSITORY_URL github_repo
     - cd github_repo
     - git checkout -b dev
-    - git pull https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:dev dev
+    - git pull https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git dev
     - git push origin dev
 
 # sync-with-github:
