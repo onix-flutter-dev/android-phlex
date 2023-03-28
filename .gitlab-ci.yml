@@ -21,8 +21,8 @@ deploy:
   stage: deploy
   script:
     - echo https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git HEAD:dev
-    - echo $REMOTE_REPOSITORY_URL
-    - git clone $REMOTE_REPOSITORY_URL main
+    - echo $REMOTE_GITHUB_REPOSITORY_URL
+    - git clone $REMOTE_GITHUB_REPOSITORY_URL main
     - cd github_repo
     - git checkout -b dev
     - git pull https://root:$ACCESS_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git dev
