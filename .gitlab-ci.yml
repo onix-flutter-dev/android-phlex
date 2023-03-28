@@ -108,7 +108,7 @@ stages:
 #     - echo "$SLACK_MESSAGE"
 #     - curl -v -X POST --data "{'title':'${SLACK_MESSAGE}', 'text':'${CI_COMMIT_RELEASE_NOTES}'}" https://hooks.slack.com/services/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
 
-# INFO
+# INFO 3
 changelog:
  stage: changelog
  only:
