@@ -10,6 +10,7 @@ import com.phlex.databinding.FragmentFirstBinding
 
 class FirstFragment : Fragment() {
 
+
     private var _binding: FragmentFirstBinding? = null
     private val binding get() = _binding!!
 
